@@ -52,12 +52,14 @@ class ResConfigSettings(models.TransientModel):
     
     theme_default_sidebar_preference = fields.Selection(
         related='company_id.default_sidebar_preference',
-        readonly=False
+        readonly=False,
+        required=True
     )
 
     theme_default_chatter_preference = fields.Selection(
         related='company_id.default_chatter_preference',
-        readonly=False
+        readonly=False,
+        required=True
     )
     
     theme_color_brand = fields.Char(

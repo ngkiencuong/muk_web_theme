@@ -31,13 +31,13 @@ class ResUsers(models.Model):
     # Defaults
     #----------------------------------------------------------
     
-    @api.model
-    def _default_sidebar_type(self):
-        return self.env.user.company_id.default_sidebar_preference or 'large'
-    
-    @api.model
-    def _default_chatter_position(self):
-        return self.env.user.company_id.default_chatter_preference or 'sided'
+    # @api.model
+    # def _default_sidebar_type(self):
+    #     return self.env.user.company_id.default_sidebar_preference or 'large'
+    #
+    # @api.model
+    # def _default_chatter_position(self):
+    #     return self.env.user.company_id.default_chatter_preference or 'sided'
     
     #----------------------------------------------------------
     # Database
@@ -51,7 +51,9 @@ class ResUsers(models.Model):
         ], 
         required=True,
         string="Sidebar Type",
-        default=lambda self: self._default_sidebar_type()
+        # default=lambda self: self._default_sidebar_type(),
+        compute="_compute_sidebar_type",
+        store=True
     )
     
     chatter_position = fields.Selection(
@@ -60,10 +62,24 @@ class ResUsers(models.Model):
             ('sided', 'Sided'),
         ], 
         required=True,
-        string="Chatter Position", 
-        default=lambda self: self._default_chatter_position()
+        string="Chatter Position",
+        # default=lambda self: self._default_chatter_position(),
+        compute="_compute_chatter_position",
+        store=True
     )
-    
+
+    @api.depends('company_id.default_sidebar_preference')
+    def _compute_sidebar_type(self):
+        if self.company_id.default_sidebar_preference:
+            for rec in self:
+                rec.sidebar_type = self.company_id.default_sidebar_preference
+
+    @api.depends('company_id.default_chatter_preference')
+    def _compute_chatter_position(self):
+        if self.company_id.default_chatter_preference:
+            for rec in self:
+                rec.chatter_position = self.company_id.default_chatter_preference
+
     #----------------------------------------------------------
     # Setup
     #----------------------------------------------------------
